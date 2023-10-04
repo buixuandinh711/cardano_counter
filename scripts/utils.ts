@@ -1,4 +1,4 @@
-import { C, Lucid, SpendingValidator, fromHex, toHex } from "lucid";
+import { C, Lucid, SpendingValidator, Tx, fromHex, toHex } from "lucid";
 import { encode } from "cbor";
 
 export async function readValidator(
@@ -29,4 +29,11 @@ export function decodeDatum(scriptDatum: string): string {
     C.PlutusData.from_bytes(fromHex(scriptDatum)),
     C.PlutusDatumSchema.DetailedSchema
   );
+}
+
+export async function submitTx(tx: Tx): Promise<string> {
+  const completedTx = await tx.complete();
+  const signedTx = await completedTx.sign().complete();
+  const txHash = await signedTx.submit();
+  return txHash;
 }
